@@ -1,89 +1,82 @@
-# Path to your oh-my-zsh installation.
-ZSH=/usr/share/oh-my-zsh/
+# Set the directory we want to store zinit and plugins
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 
-# Path to powerlevel10k theme
-source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
-
-# List of plugins used
-plugins=()
-source $ZSH/oh-my-zsh.sh
-
-# In case a command is not found, try to find the package that has it
-function command_not_found_handler {
-    local purple='\e[1;35m' bright='\e[0;1m' green='\e[1;32m' reset='\e[0m'
-    printf 'zsh: command not found: %s\n' "$1"
-    local entries=( ${(f)"$(/usr/bin/pacman -F --machinereadable -- "/usr/bin/$1")"} )
-    if (( ${#entries[@]} )) ; then
-        printf "${bright}$1${reset} may be found in the following packages:\n"
-        local pkg
-        for entry in "${entries[@]}" ; do
-            local fields=( ${(0)entry} )
-            if [[ "$pkg" != "${fields[2]}" ]] ; then
-                printf "${purple}%s/${bright}%s ${green}%s${reset}\n" "${fields[1]}" "${fields[2]}" "${fields[3]}"
-            fi
-            printf '    /%s\n' "${fields[4]}"
-            pkg="${fields[2]}"
-        done
-    fi
-    return 127
-}
-
-# Detect the AUR wrapper
-if pacman -Qi yay &>/dev/null ; then
-   aurhelper="yay"
-elif pacman -Qi paru &>/dev/null ; then
-   aurhelper="paru"
+# Download Zinit, if it's not there yet
+if [ ! -d "$ZINIT_HOME" ]; then
+   mkdir -p "$(dirname $ZINIT_HOME)"
+   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
 
-function in {
-    local -a inPkg=("$@")
-    local -a arch=()
-    local -a aur=()
+# Source/Load zinit
+source "${ZINIT_HOME}/zinit.zsh"
 
-    for pkg in "${inPkg[@]}"; do
-        if pacman -Si "${pkg}" &>/dev/null ; then
-            arch+=("${pkg}")
-        else 
-            aur+=("${pkg}")
-        fi
-    done
+# Add in Powerlevel10k
+zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-    if [[ ${#arch[@]} -gt 0 ]]; then
-        sudo pacman -S "${arch[@]}"
-    fi
+# Add in zsh plugins
+zinit ice depth=1; zinit light zsh-users/zsh-completions
+zinit ice depth=1; zinit light zsh-users/zsh-autosuggestions
+zinit ice depth=1; zinit ice wait'1' lucid; zinit light zsh-users/zsh-syntax-highlighting
+zinit ice depth=1; zinit ice wait'1' lucid; zinit light Aloxaf/fzf-tab
 
-    if [[ ${#aur[@]} -gt 0 ]]; then
-        ${aurhelper} -S "${aur[@]}"
-    fi
-}
+# Load completions
+autoload -Uz compinit && compinit
 
-# Helpful aliases
-alias  c='clear' # clear terminal
-alias  l='eza -lh  --icons=auto' # long list
-alias ls='eza -1   --icons=auto' # short list
-alias ll='eza -lha --icons=auto --sort=name --group-directories-first' # long list all
-alias ld='eza -lhD --icons=auto' # long list dirs
-alias lt='eza --icons=auto --tree' # list folder as tree
-alias un='$aurhelper -Rns' # uninstall package
-alias up='$aurhelper -Syu' # update system/package/aur
-alias pl='$aurhelper -Qs' # list installed package
-alias pa='$aurhelper -Ss' # list available package
-alias pc='$aurhelper -Sc' # remove unused cache
-alias po='$aurhelper -Qtdq | $aurhelper -Rns -' # remove unused packages, also try > $aurhelper -Qqd | $aurhelper -Rsu --print -
-alias vc='code' # gui code editor
-
-# Handy change dir shortcuts
-alias ..='cd ..'
-alias ...='cd ../..'
-alias .3='cd ../../..'
-alias .4='cd ../../../..'
-alias .5='cd ../../../../..'
-
-# Always mkdir a path (this doesn't inhibit functionality to make a single dir)
-alias mkdir='mkdir -p'
+zinit cdreplay -q
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-#Display Pokemon
-pokemon-colorscripts --no-title -r 1,3,6
+# Keybindings
+bindkey -e
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+bindkey '^[w' kill-region
+
+# History
+HISTSIZE=10000
+HISTFILE=~/.zsh_history
+SAVEHIST=$HISTSIZE
+setopt append_history
+setopt share_history
+setopt extended_history
+setopt hist_ignore_space
+setopt hist_ignore_all_dups
+setopt hist_save_no_dups
+setopt hist_ignore_dups
+setopt hist_find_no_dups
+
+# Dont save wrong commands
+zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
+
+# Remove duplicated commands in zsh_history
+function rmdups {
+   cat -n "$HISTFILE" | sort -t ';' -uk2 | sort -nk1 | cut -f2- > "$HISTFILE"
+}
+
+# Remove commands from history that starts with the given argument e.g. rmcmd foo
+function rmcmd {
+    local prefix="$1"
+    awk -v prefix="$prefix" -F ';' 'index($2, prefix) != 1 { print }' "$HISTFILE" > "$HISTFILE.tmp" && mv "$HISTFILE.tmp" "$HISTFILE"
+}
+
+# Completion styling
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+
+# Aliases
+alias ls='eza -1 --icons=auto'
+#alias ls='ls -p --color=auto'
+alias ll='ls -al'
+alias c='clear'
+alias pacman='sudo pacman'
+alias apt='sudo apt'
+alias mkdir='mkdir -p'
+alias yoink='yay'
+alias dl='~/./Shell-scripts/youtube-downloader.py'
+alias vim='NVIM_APPNAME=vim nvim'
+
+# Shell integrations
+eval "$(fzf --zsh)"
