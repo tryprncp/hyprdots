@@ -65,12 +65,32 @@ dolphin                                                # kde file manager
 ark                                                    # kde file archiver
 neovim                                                 # terminal text editor
 code                                                   # ide text editor
-vlc
-pix
 
 # --------------------------------------------------- // Shell
-eza
-fastfetch                                               # system information fetch tool
+eza|zsh                                                # file lister for zsh
+fastfetch                                              # system information fetch tool
+fzf
 
 # --------------------------------------------------- // HyDE
 hyde-cli-git                                           # cli tool to manage hyde
+
+# utilities
+github-cli
+vlc
+pix
+wine
+wine-gecko
+wine-mono
+winetricks
+btop
+man-db
+obs-studio
+spotube-bin
+qemu-desktop
+dnsmasq
+iptables-nft
+bridge-utils
+virt-manager
+virt-viewer
+android-studio
+
