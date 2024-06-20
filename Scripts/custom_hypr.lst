@@ -84,6 +84,9 @@ wine-mono
 winetricks
 btop
 man-db
+rtorrent
+aria2
+ani-cli
 obs-studio
 spotube-bin
 qemu-desktop
@@ -92,5 +95,4 @@ iptables-nft
 bridge-utils
 virt-manager
 virt-viewer
-android-studio
 
