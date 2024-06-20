@@ -67,7 +67,8 @@ neovim                                                 # terminal text editor
 code                                                   # ide text editor
 
 # --------------------------------------------------- // Shell
-eza|zsh                                                # file lister for zsh
+eza
+zsh                                                    # file lister for zsh
 fastfetch                                              # system information fetch tool
 fzf
 
@@ -75,6 +76,7 @@ fzf
 hyde-cli-git                                           # cli tool to manage hyde
 
 # utilities
+github-cli
 vlc
 pix
 wine
@@ -82,7 +84,7 @@ wine-gecko
 wine-mono
 winetricks
 btop
-man
+man-db
 obs-studio
 spotube-bin
 qemu-desktop
@@ -92,3 +94,4 @@ bridge-utils
 virt-manager
 virt-viewer
 android-studio
+
