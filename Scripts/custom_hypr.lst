@@ -84,6 +84,7 @@ wine-gecko
 wine-mono
 winetricks
 btop
+stow
 man-db
 rtorrent
 aria2
@@ -96,4 +97,4 @@ iptables-nft
 bridge-utils
 virt-manager
 virt-viewer
-
+android-studio
