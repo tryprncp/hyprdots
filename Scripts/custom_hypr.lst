@@ -78,13 +78,11 @@ hyde-cli-git                                           # cli tool to manage hyde
 github-cli
 vlc
 pix
-wine
-wine-gecko
-wine-mono
-winetricks
+powerprofilesctl
 btop
 stow
 man-db
+nethogs
 rtorrent
 aria2
 ani-cli
@@ -96,4 +94,3 @@ iptables-nft
 bridge-utils
 virt-manager
 virt-viewer
-android-studio
